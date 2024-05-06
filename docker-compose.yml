@@ -1,0 +1,24 @@
+services:
+  app:
+    image: earl/byob
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/byob
+      - SPRING_DATASOURCE_USERNAME=byobuser
+      - SPRING_DATASOURCE_PASSWORD=byobpw
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8080:8080"
+
+  db:
+    image: mysql
+    container_name: db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=byob
+      - MYSQL_USER=byobuser
+      - MYSQL_PASSWORD=byobpw
+    ports:
+      - "3306:3306"

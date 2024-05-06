@@ -1,0 +1,34 @@
+server:
+  port: 8080
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/byob
+    username: byobuser
+    password: byobpw
+  jpa:
+    hibernate:
+      ddl-auto: update
+---
+spring:
+  application:
+    name: BeYourOwnBarista
+  h2:
+    console:
+      enabled: true
