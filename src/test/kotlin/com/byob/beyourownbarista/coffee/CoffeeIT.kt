@@ -1,5 +1,7 @@
 package com.byob.beyourownbarista.coffee
 
+import com.byob.beyourownbarista.api.coffee.Coffee
+import com.byob.beyourownbarista.api.coffee.CoffeeRepository
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContain

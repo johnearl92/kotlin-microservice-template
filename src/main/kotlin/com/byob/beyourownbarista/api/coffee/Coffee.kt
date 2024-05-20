@@ -1,4 +1,4 @@
-package com.byob.beyourownbarista.coffee
+package com.byob.beyourownbarista.api.coffee
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

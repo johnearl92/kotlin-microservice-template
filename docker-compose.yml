@@ -1,24 +1,88 @@
 services:
-  app:
-    image: earl/byob
-    container_name: app
-    depends_on:
-      - db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/byob
-      - SPRING_DATASOURCE_USERNAME=byobuser
-      - SPRING_DATASOURCE_PASSWORD=byobpw
-      - SPRING_PROFILES_ACTIVE=prod
+  #  app:
+  #    image: earl/byob
+  #    container_name: app
+  #    depends_on:
+  #      - db
+  #    environment:
+  #      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/byob
+  #      - SPRING_DATASOURCE_USERNAME=byobuser
+  #      - SPRING_DATASOURCE_PASSWORD=byobpw
+  #      - SPRING_PROFILES_ACTIVE=prod
+  #    ports:
+  #      - "8080:8080"
+  #
+  #  db:
+  #    image: mysql
+  #    container_name: db
+  #    environment:
+  #      - MYSQL_ROOT_PASSWORD=root
+  #      - MYSQL_DATABASE=byob
+  #      - MYSQL_USER=byobuser
+  #      - MYSQL_PASSWORD=byobpw
+  #    ports:
+  #      - "3306:3306"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
     ports:
-      - "8080:8080"
+      - 9200:9200
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    networks:
+      - local
+    healthcheck:
+      test: curl -s http://localhost:9200 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
 
-  db:
-    image: mysql
-    container_name: db
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=byob
-      - MYSQL_USER=byobuser
-      - MYSQL_PASSWORD=byobpw
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     ports:
-      - "3306:3306"
+      - 5601:5601
+    environment:
+      - SERVERNAME=kibana
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - local
+    healthcheck:
+      test: curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  kibanasetup:
+    image: alpine/curl:8.2.1
+    depends_on:
+      kibana:
+        condition: service_healthy
+    volumes:
+      - "./conf/kibana_export.ndjson:/usr/share/kibana_export.ndjson:ro"
+    networks:
+      - local
+    restart: "no"
+    command: >
+      curl -vvv -X POST "kibana:5601/api/saved_objects/_import?overwrite=true" --form file=@/usr/share/kibana_export.ndjson -H 'kbn-xsrf: true'
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.8.0
+    depends_on:
+      kibana:
+        condition: service_healthy
+    user: root
+    volumes:
+      - "./logs/:/usr/share/logstash/app_logs/"
+      - "./conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+    networks:
+      - local
+    environment:
+      - xpack.monitoring.enabled=false
+      - ELASTIC_HOSTS=http://elasticsearch:9200
+
+networks:
+  local:
