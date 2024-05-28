@@ -1,0 +1,1 @@
+INSERT INTO coffee (name, price) VALUES ('latte', 2.5);

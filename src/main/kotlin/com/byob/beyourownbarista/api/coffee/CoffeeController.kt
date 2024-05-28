@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@RequestMapping("/coffee")
+@RequestMapping("/api/v1/coffee")
 class CoffeeController(private val coffeeRepository: CoffeeRepository) {
     private val logger = KotlinLogging.logger {}
 

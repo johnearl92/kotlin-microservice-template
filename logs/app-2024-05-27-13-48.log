@@ -1,0 +1,3 @@
+{"timestamp":"2024-05-27 13:48:59.115","level":"INFO","thread":"SpringApplicationShutdownHook","logger":"org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean","message":"Closing JPA EntityManagerFactory for persistence unit 'default'","context":"default"}
+{"timestamp":"2024-05-27 13:48:59.121","level":"INFO","thread":"SpringApplicationShutdownHook","logger":"com.zaxxer.hikari.HikariDataSource","message":"HikariPool-1 - Shutdown initiated...","context":"default"}
+{"timestamp":"2024-05-27 13:48:59.126","level":"INFO","thread":"SpringApplicationShutdownHook","logger":"com.zaxxer.hikari.HikariDataSource","message":"HikariPool-1 - Shutdown completed.","context":"default"}

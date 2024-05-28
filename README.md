@@ -13,13 +13,12 @@ This is a template for a kotlin-spring-boot-kotest Rest API project
 - spring-boot
 - kotest
 - structured log with ELK (elasticsearch-logstash-kibana)
+- Oauth2 Authorization
 
 # TODO:
 - kubernetes
-- Oauth2
 - webauthn
 - use leveled api keys
-- authorization
 - rate limiting mechanism
 - implement api versioning
 - allow list mechanism

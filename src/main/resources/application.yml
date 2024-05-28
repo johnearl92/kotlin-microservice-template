@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 ---
 spring:
   config:
@@ -27,6 +27,14 @@ spring:
       ddl-auto: update
 ---
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth-server:9000
+  jpa:
+    hibernate:
+      ddl-auto: create
   application:
     name: BeYourOwnBarista
   h2:
@@ -35,4 +43,4 @@ spring:
 
 springdoc:
   api-docs:
-    path: /app-api-docs
+    path: /api-docs/app-api-docs

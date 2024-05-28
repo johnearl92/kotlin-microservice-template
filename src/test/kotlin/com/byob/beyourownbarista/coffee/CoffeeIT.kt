@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.web.servlet.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,20 +28,21 @@ class CoffeeIT : BehaviorSpec() {
     val mapper = jacksonObjectMapper()
 
     init {
-
         beforeSpec {
             coffeeRepository.deleteAll()
         }
-
+    // TODO streamline authorization https://www.baeldung.com/spring-security-integration-tests , https://docs.spring.io/spring-security/reference/servlet/test/mockmvc/setup.html
         Given("a coffee with name 'Espresso' and price 2.5") {
             val name = "Espresso"
             val price = 2.5
             var coffee = Coffee(name = name, price = price)
 
             When("creating a new coffee") {
-                coffee = mockMvc.post("/coffee") {
+                coffee = mockMvc.post("/api/v1/coffee") {
                     contentType = MediaType.APPLICATION_JSON
                     content = mapper.writeValueAsString(coffee)
+                    with(SecurityMockMvcRequestPostProcessors.csrf())
+                    with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
                 }.andExpect {
                     status { isCreated() }
                 }.andReturn().response.contentAsString.let {
@@ -53,8 +56,10 @@ class CoffeeIT : BehaviorSpec() {
             }
 
             When("getting all coffees") {
-                val allCoffees = mockMvc.get("/coffee") {
+                val allCoffees = mockMvc.get("/api/v1/coffee") {
                     contentType = MediaType.APPLICATION_JSON
+                    with(SecurityMockMvcRequestPostProcessors.csrf())
+                    with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
                 }.andExpect {
                     status { isOk() }
                 }.andReturn().response.contentAsString.let {
@@ -68,8 +73,10 @@ class CoffeeIT : BehaviorSpec() {
 
             When("getting the coffee by id") {
                 and("the id is valid") {
-                    val coffeeById = mockMvc.get("/coffee/${coffee.id}") {
+                    val coffeeById = mockMvc.get("/api/v1/coffee/${coffee.id}") {
                         contentType = MediaType.APPLICATION_JSON
+                        with(SecurityMockMvcRequestPostProcessors.csrf())
+                        with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
                     }.andExpect {
                         status { isOk() }
                     }.andReturn().response.contentAsString.let {
@@ -82,7 +89,10 @@ class CoffeeIT : BehaviorSpec() {
                 }
 
                 and("the id is not valid") {
-                    val request = mockMvc.get("/coffee/2")
+                    val request = mockMvc.get("/api/v1/coffee/2") {
+                        with(SecurityMockMvcRequestPostProcessors.csrf())
+                        with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
+                    }
 
                     Then("no coffee should be returned") {
                         request.andExpect { status { isNotFound() } }
@@ -93,9 +103,11 @@ class CoffeeIT : BehaviorSpec() {
             When("updating the coffee") {
                 val updatedCoffee = coffee.copy(price = 3.0)
                 and("the coffee id is valid") {
-                    val updatedFromDb = mockMvc.put("/coffee/${coffee.id}") {
+                    val updatedFromDb = mockMvc.put("/api/v1/coffee/${coffee.id}") {
                         contentType = MediaType.APPLICATION_JSON
                         content = mapper.writeValueAsString(updatedCoffee)
+                        with(SecurityMockMvcRequestPostProcessors.csrf())
+                        with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
                     }.andExpect {
                         status { isOk() }
                     }.andReturn().response.contentAsString.let {
@@ -107,9 +119,11 @@ class CoffeeIT : BehaviorSpec() {
                     }
                 }
                 and("the coffee id is invalid") {
-                    val result = mockMvc.put("/coffee/2") {
+                    val result = mockMvc.put("/api/v1/coffee/2") {
                         contentType = MediaType.APPLICATION_JSON
                         content = mapper.writeValueAsString(updatedCoffee)
+                        with(SecurityMockMvcRequestPostProcessors.csrf())
+                        with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
                     }
 
                     Then("no coffee should updated") {
@@ -121,14 +135,23 @@ class CoffeeIT : BehaviorSpec() {
 
             When("deleting a coffee") {
                 and("the coffee id is valid") {
-                    mockMvc.delete("/coffee/${coffee.id}").andExpect { status { isNoContent() } }
+                    mockMvc.delete("/api/v1/coffee/${coffee.id}") {
+                        with(SecurityMockMvcRequestPostProcessors.csrf())
+                        with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
+                    }.andExpect { status { isNoContent() } }
                     Then("coffee should be deleted") {
-                        mockMvc.get("/coffee/${coffee.id}").andExpect { status { isNotFound() } }
+                        mockMvc.get("/api/v1/coffee/${coffee.id}") {
+                            with(SecurityMockMvcRequestPostProcessors.csrf())
+                            with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
+                        }.andExpect { status { isNotFound() } }
                     }
                 }
 
                 and("the coffee id is invalid") {
-                    val resultAction = mockMvc.delete("/coffee/2")
+                    val resultAction = mockMvc.delete("/api/v1/coffee/2") {
+                        with(SecurityMockMvcRequestPostProcessors.csrf())
+                        with(SecurityMockMvcRequestPostProcessors.user("tester").authorities(SimpleGrantedAuthority("SCOPE_byob.read")))
+                    }
                     Then("no coffee should be deleted") {
                         resultAction.andExpect { status { isNotFound() } }
                     }
