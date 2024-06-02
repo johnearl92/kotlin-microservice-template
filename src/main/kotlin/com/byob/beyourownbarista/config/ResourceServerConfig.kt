@@ -16,8 +16,8 @@ class ResourceServerConfig {
         http.securityMatcher("/api/**")
                 .authorizeHttpRequests { authorize ->
                     authorize
-                            .anyRequest()
-                            .hasAuthority("SCOPE_byob.read")
+                            .anyRequest().permitAll()
+//                            .hasAuthority("SCOPE_byob.read")
                 }
                 .oauth2ResourceServer { oauth2 -> oauth2.jwt(Customizer.withDefaults()) }
         return http.build()

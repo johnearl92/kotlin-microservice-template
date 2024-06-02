@@ -1,6 +1,8 @@
 # Overview
 
-This is a template for a kotlin-spring-boot-kotest Rest API project
+This is a template POC for an API service implemented in kotlin.
+Refer to the Stack and concepts for the details on what was applied on this project.
+
 
 
 # Pre-requisites
@@ -9,18 +11,19 @@ This is a template for a kotlin-spring-boot-kotest Rest API project
 - docker
 
 # Stack and concepts applied
+- TDD
 - kotlin
 - spring-boot
 - kotest
 - structured log with ELK (elasticsearch-logstash-kibana)
 - Oauth2 Authorization
+- rate limiting mechanism
+- implement api versioning
 
 # TODO:
 - kubernetes
 - webauthn
 - use leveled api keys
-- rate limiting mechanism
-- implement api versioning
 - allow list mechanism
 
 # How To
