@@ -12,6 +12,7 @@ Refer to the Stack and concepts for the details on what was applied on this proj
 
 # Stack and concepts applied
 - TDD
+- BDD
 - kotlin
 - spring-boot
 - kotest
