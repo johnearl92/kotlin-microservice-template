@@ -17,6 +17,6 @@ class BucketService {
     }
 
     fun createNewBucket() =  Bucket.builder()
-        .addLimit { limit -> limit.capacity(50).refillGreedy(10, Duration.ofSeconds(1)) }
+        .addLimit { limit -> limit.capacity(20).refillIntervally(20, Duration.ofHours(1)) }
         .build()
 }
